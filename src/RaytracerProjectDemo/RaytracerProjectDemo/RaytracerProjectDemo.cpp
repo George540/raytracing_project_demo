@@ -1,17 +1,43 @@
-// RaytracerProjectDemo.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+﻿// RaytracerProjectDemo.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 #include "vec3.h"
 #include "color.h"
+#include "ray.h"
 
 #include <iostream>
+
+
+/**
+ * \brief Linearly blends white and blue depending on the height of the y
+ * coordinate after scaling the ray direction to unit length
+ * Formula: blendedValue=(1−t)⋅startValue+t⋅endValue
+ * \param r ray to color
+ * \return colored version of the ray
+ */
+color ray_color(const ray& r)
+{
+    auto unity_direction = unit_vector(r.direction());
+    auto t = 0.5f * (unity_direction.y() + 1.0f);
+    return (1.0f - t) * color(1.0f, 1.0f, 1.0f) + t * color(0.5f, 0.7f, 1.0f);
+}
 
 int main() {
 
     // Image
+    const auto aspect_ratio = 16.0f / 9.0f;
+    const int image_width = 400;
+    const int image_height = static_cast<int>(image_width / aspect_ratio);
 
-    constexpr int image_width = 256;
-    constexpr int image_height = 256;
+    // Camera
+
+    auto viewport_height = 2.0f;
+    auto viewport_width = aspect_ratio * viewport_height;
+    auto focal_length = 1.0f;
+
+    auto origin = point3(0.0f, 0.0f, 0.0f);
+    auto horizontal = vec3(viewport_height, 0.0f, 0.0f);
+    auto vertical = vec3(0.0f, viewport_height, 0.0f);
+    auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - vec3(0.0f, 0.0f, focal_length);
 
     // Render
 
@@ -20,7 +46,10 @@ int main() {
     for (int j = image_height - 1; j >= 0; --j) {
         std::cerr << "\rScan lines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
-            color pixel_color(static_cast<float>(i) / (image_width - 1), static_cast<float>(j) / (image_height - 1), 0.25);
+            auto u = float(i) / (image_width - 1);
+            auto v = float(j) / (image_height - 1);
+            ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
+            color pixel_color = ray_color(r);
             write_color(std::cout, pixel_color);
         }
     }
