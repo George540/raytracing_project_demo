@@ -1,6 +1,9 @@
 // RaytracerProjectDemo.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#include "vec3.h"
+#include "color.h"
+
 #include <iostream>
 
 int main() {
@@ -15,17 +18,10 @@ int main() {
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
     for (int j = image_height - 1; j >= 0; --j) {
+        std::cerr << "\rScan lines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
-            std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
-	        const auto r = static_cast<double>(i) / (image_width - 1);
-	        const auto g = static_cast<double>(j) / (image_height - 1);
-	        const auto b = 0.25;
-
-            int ir = static_cast<int>(255.999 * r);
-            int ig = static_cast<int>(255.999 * g);
-            int ib = static_cast<int>(255.999 * b);
-
-            std::cout << ir << ' ' << ig << ' ' << ib << '\n';
+            color pixel_color(static_cast<float>(i) / (image_width - 1), static_cast<float>(j) / (image_height - 1), 0.25);
+            write_color(std::cout, pixel_color);
         }
     }
 

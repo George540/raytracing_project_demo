@@ -60,7 +60,7 @@ class vec3
 using point3 = vec3;   // 3D point
 using color = vec3;    // RGB color
 
-// Utility Functions
+// Utility/Friend Functions
 inline std::ostream& operator<<(std::ostream& out, const vec3& v)
 {
 	return out << v.coords[0] << ' ' << v.coords[1] << ' ' << v.coords[2];
