@@ -9,6 +9,9 @@ using std::sqrt;
 class vec3
 {
 	public:
+		// Variables
+		float coords[3];
+
 		// Constructors
 		vec3() : coords{0 ,0 ,0} {}
 		vec3(const float e0, const float e1, const float e2) : coords{e0, e1, e2} {}
@@ -52,8 +55,6 @@ class vec3
 		{
 			return coords[0] * coords[0] + coords[1] * coords[1] + coords[2] * coords[2];
 		}
-
-		float coords[3];
 };
 
 // Type aliases for vec3
