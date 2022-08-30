@@ -6,6 +6,15 @@
 
 #include <iostream>
 
+bool hit_sphere(const point3& center, const float radius, const ray& r)
+{
+    vec3 oc = r.origin() - center; // (P - C)
+    auto a = dot(r.direction(), r.direction()); // r^2
+    auto b = 2.0f * dot(oc, r.direction()); // 2tb
+    auto c = dot(oc, oc) - radius * radius; // (P - C)^2 - r^2
+    auto discriminant = b * b - 4 * a * c;
+    return discriminant > 0;
+}
 
 /**
  * \brief Linearly blends white and blue depending on the height of the y
@@ -16,6 +25,10 @@
  */
 color ray_color(const ray& r)
 {
+    if (hit_sphere(point3(0.0f, 0.0f, -1.0f), 0.5f, r))
+    {
+        return color(1.0f, 0.0f, 0.0f);
+    }
     auto unity_direction = unit_vector(r.direction());
     auto t = 0.5f * (unity_direction.y() + 1.0f);
     return (1.0f - t) * color(1.0f, 1.0f, 1.0f) + t * color(0.5f, 0.7f, 1.0f);
@@ -35,7 +48,7 @@ int main() {
     auto focal_length = 1.0f;
 
     auto origin = point3(0.0f, 0.0f, 0.0f);
-    auto horizontal = vec3(viewport_height, 0.0f, 0.0f);
+    auto horizontal = vec3(viewport_width, 0.0f, 0.0f);
     auto vertical = vec3(0.0f, viewport_height, 0.0f);
     auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - vec3(0.0f, 0.0f, focal_length);
 
@@ -46,9 +59,9 @@ int main() {
     for (int j = image_height - 1; j >= 0; --j) {
         std::cerr << "\rScan lines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
-            auto u = float(i) / (image_width - 1);
-            auto v = float(j) / (image_height - 1);
-            ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
+            auto v = float(i) / (image_width - 1);
+            auto u = float(j) / (image_height - 1);
+            ray r(origin, lower_left_corner + v * horizontal + u * vertical - origin);
             color pixel_color = ray_color(r);
             write_color(std::cout, pixel_color);
         }
