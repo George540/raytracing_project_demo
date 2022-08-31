@@ -6,14 +6,20 @@
 
 #include <iostream>
 
-bool hit_sphere(const point3& center, const float radius, const ray& r)
+float hit_sphere(const point3& center, const float radius, const ray& r)
 {
+    // Using the quadratic formula to find the two points in the sphere
+    // Notice how b has a factor two in it, so b = 2h, h = b/2 or half_b
     vec3 oc = r.origin() - center; // (P - C)
-    auto a = dot(r.direction(), r.direction()); // r^2
-    auto b = 2.0f * dot(oc, r.direction()); // 2tb
+    auto a = r.direction().length_squared(); // r^2
+    auto half_b = dot(oc, r.direction()); // 2tb
     auto c = dot(oc, oc) - radius * radius; // (P - C)^2 - r^2
-    auto discriminant = b * b - 4 * a * c;
-    return discriminant > 0;
+    auto discriminant = half_b * half_b - a * c;
+    if (discriminant < 0)
+    {
+        return -1.0f;
+    }
+    return (-half_b - sqrt(discriminant)) / a;
 }
 
 /**
@@ -25,12 +31,14 @@ bool hit_sphere(const point3& center, const float radius, const ray& r)
  */
 color ray_color(const ray& r)
 {
-    if (hit_sphere(point3(0.0f, 0.0f, -1.0f), 0.5f, r))
+    auto t = hit_sphere(point3(0.0f, 0.0f, -1.0f), 0.5f, r);
+    if (t > 0.0f)
     {
-        return color(1.0f, 0.0f, 0.0f);
+        vec3 N = unit_vector(r.at(t) - vec3(0.0f, 0.0f, -1.0f));
+        return 0.5f * color(N.x() + 1, N.y() + 1, N.z() + 1);
     }
     auto unity_direction = unit_vector(r.direction());
-    auto t = 0.5f * (unity_direction.y() + 1.0f);
+    t = 0.5f * (unity_direction.y() + 1.0f);
     return (1.0f - t) * color(1.0f, 1.0f, 1.0f) + t * color(0.5f, 0.7f, 1.0f);
 }
 
