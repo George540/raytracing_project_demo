@@ -1,45 +1,31 @@
 ﻿// RaytracerProjectDemo.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
-#include "vec3.h"
+#include "utilities.h"
+
 #include "color.h"
-#include "ray.h"
+#include "hittable_list.h"
+#include "sphere.h"
 
 #include <iostream>
-
-float hit_sphere(const point3& center, const float radius, const ray& r)
-{
-    // Using the quadratic formula to find the two points in the sphere
-    // Notice how b has a factor two in it, so b = 2h, h = b/2 or half_b
-    vec3 oc = r.origin() - center; // (P - C)
-    auto a = r.direction().length_squared(); // r^2
-    auto half_b = dot(oc, r.direction()); // 2tb
-    auto c = dot(oc, oc) - radius * radius; // (P - C)^2 - r^2
-    auto discriminant = half_b * half_b - a * c;
-    if (discriminant < 0)
-    {
-        return -1.0f;
-    }
-    return (-half_b - sqrt(discriminant)) / a;
-}
 
 /**
  * \brief Linearly blends white and blue depending on the height of the y
  * coordinate after scaling the ray direction to unit length
  * Formula: blendedValue=(1−t)⋅startValue+t⋅endValue
  * \param r ray to color
+ * \param world
  * \return colored version of the ray
  */
-color ray_color(const ray& r)
+color ray_color(const ray& r, const hittable& world)
 {
-    auto t = hit_sphere(point3(0.0f, 0.0f, -1.0f), 0.5f, r);
-    if (t > 0.0f)
-    {
-        vec3 N = unit_vector(r.at(t) - vec3(0.0f, 0.0f, -1.0f));
-        return 0.5f * color(N.x() + 1, N.y() + 1, N.z() + 1);
-    }
-    auto unity_direction = unit_vector(r.direction());
-    t = 0.5f * (unity_direction.y() + 1.0f);
-    return (1.0f - t) * color(1.0f, 1.0f, 1.0f) + t * color(0.5f, 0.7f, 1.0f);
+	hit_record rec;
+	if (world.hit(r, 0, infinity, rec)) {
+		return 0.5f * (rec.normal + color(1.0f, 1.0f, 1.0f));
+	}
+    // if hit nothing, render gradient bg
+	vec3 unit_direction = unit_vector(r.direction());
+	auto t = 0.5f * (unit_direction.y() + 1.0f);
+	return (1.0f - t) * color(1.0f, 1.0f, 1.0f) + t * color(0.5f, 0.7f, 1.0f);
 }
 
 int main() {
@@ -49,8 +35,12 @@ int main() {
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
-    // Camera
+    // World
+    hittable_list world;
+    world.add(make_shared<sphere>(point3(0.0f, 0.0f, -1.0f), 0.5f));
+    world.add(make_shared<sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f));
 
+    // Camera
     auto viewport_height = 2.0f;
     auto viewport_width = aspect_ratio * viewport_height;
     auto focal_length = 1.0f;
@@ -67,10 +57,10 @@ int main() {
     for (int j = image_height - 1; j >= 0; --j) {
         std::cerr << "\rScan lines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
-            auto v = float(i) / (image_width - 1);
-            auto u = float(j) / (image_height - 1);
+            auto v = static_cast<float>(i) / (image_width - 1);
+            auto u = static_cast<float>(j) / (image_height - 1);
             ray r(origin, lower_left_corner + v * horizontal + u * vertical - origin);
-            color pixel_color = ray_color(r);
+            color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }

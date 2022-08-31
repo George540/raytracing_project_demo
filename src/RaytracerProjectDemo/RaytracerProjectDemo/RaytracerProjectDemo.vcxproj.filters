@@ -38,5 +38,8 @@
     <ClInclude Include="include\hittable_list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
