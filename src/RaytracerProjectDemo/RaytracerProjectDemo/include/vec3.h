@@ -77,6 +77,11 @@ inline vec3 operator-(const vec3& v, const vec3& u)
 	return vec3(v.coords[0] - u.coords[0], v.coords[1] - u.coords[1], v.coords[2] - u.coords[2]);
 }
 
+inline vec3 operator-(const vec3&v)
+{
+	return vec3(-v.coords[0], -v.coords[1], -v.coords[2]);
+}
+
 inline vec3 operator*(const vec3& v, const vec3& u)
 {
 	return vec3(v.coords[0] * u.coords[0], v.coords[1] * u.coords[1], v.coords[2] * u.coords[2]);
