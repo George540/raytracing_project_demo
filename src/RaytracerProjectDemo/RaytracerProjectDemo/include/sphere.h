@@ -13,11 +13,11 @@ public:
 	sphere() : center{ 0.0f, 0.0f, 0.0f }, radius(1.0f) {}
 	sphere(point3 cen, float r) : center(cen), radius(r) {}
 
-	virtual bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
+	bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
 
 };
 
-bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec) const
+inline bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec) const
 {
 	// Using the quadratic formula to find the two points in the sphere
 	// Notice how b has a factor two in it, so b = 2h, h = b/2 or half_b

@@ -10,7 +10,7 @@ struct hit_record
 	float t;
 	bool is_front_face;
 
-	inline void set_face_normal(const ray& r, const vec3& outward_normal)
+	void set_face_normal(const ray& r, const vec3& outward_normal)
 	{
 		is_front_face = dot(r.direction(), outward_normal) < 0.0f; // if > 0, ray is inside the sphere, else, otherwise
 		normal = is_front_face ? outward_normal : -outward_normal;
@@ -20,6 +20,7 @@ struct hit_record
 class hittable
 {
 public:
+	virtual ~hittable() = default;
 	virtual bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const = 0;
 };
 
