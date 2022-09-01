@@ -21,9 +21,15 @@ inline float degrees_to_radians(float degrees) {
 }
 
 inline float random_float() {
-    static std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
+    static std::uniform_real_distribution<float> distribution(0.0, 1.0);
     static std::mt19937 generator;
-    return distribution(generator);
+    const float result = distribution(generator);
+    return result;
+}
+
+inline float random_float(float min, float max)
+{
+	return min + (max - min) * random_float();
 }
 
 inline float clamp(float x, float min, float max)

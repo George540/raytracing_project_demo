@@ -55,6 +55,16 @@ class vec3
 		{
 			return coords[0] * coords[0] + coords[1] * coords[1] + coords[2] * coords[2];
 		}
+
+		static vec3 random()
+		{
+			return vec3(random_float(), random_float(), random_float());
+		}
+
+		static vec3 random(float min, float max)
+		{
+			return vec3(random_float(min, max), random_float(min, max), random_float(min, max));
+		}
 };
 
 // Type aliases for vec3
@@ -102,6 +112,7 @@ inline vec3 operator/(vec3 v, float t)
 	return (1 / t) * v;
 }
 
+// More vector calculations
 inline float dot(const vec3& v, const vec3& u)
 {
 	return v.coords[0] * u.coords[0]
@@ -119,6 +130,17 @@ inline vec3 cross(const vec3& v, const vec3& u)
 inline vec3 unit_vector(vec3 v)
 {
 	return v / v.length();
+}
+
+// Random hits in objects
+inline vec3 random_in_unit_sphere()
+{
+	while (true)
+	{
+		auto p = vec3::random(-1.0f, 1.0f);
+		if (p.length_squared() >= 1) continue;
+		return p;
+	}
 }
 
 #endif
