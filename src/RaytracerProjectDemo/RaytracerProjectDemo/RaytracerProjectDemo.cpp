@@ -5,6 +5,7 @@
 #include "color.h"
 #include "hittable_list.h"
 #include "sphere.h"
+#include "camera.h"
 
 #include <iostream>
 
@@ -34,6 +35,7 @@ int main() {
     const auto aspect_ratio = 16.0f / 9.0f;
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
+    const int samples_per_pixel = 100;
 
     // World
     hittable_list world;
@@ -41,27 +43,24 @@ int main() {
     world.add(make_shared<sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f));
 
     // Camera
-    auto viewport_height = 2.0f;
-    auto viewport_width = aspect_ratio * viewport_height;
-    auto focal_length = 1.0f;
-
-    auto origin = point3(0.0f, 0.0f, 0.0f);
-    auto horizontal = vec3(viewport_width, 0.0f, 0.0f);
-    auto vertical = vec3(0.0f, viewport_height, 0.0f);
-    auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - vec3(0.0f, 0.0f, focal_length);
+    camera cam;
 
     // Render
 
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
     for (int j = image_height - 1; j >= 0; --j) {
-        std::cerr << "\rScan lines remaining: " << j << ' ' << std::flush;
+        std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
-            auto v = static_cast<float>(i) / (image_width - 1);
-            auto u = static_cast<float>(j) / (image_height - 1);
-            ray r(origin, lower_left_corner + v * horizontal + u * vertical - origin);
-            color pixel_color = ray_color(r, world);
-            write_color(std::cout, pixel_color);
+            color pixel_color(0, 0, 0);
+            for (int s = 0; s < samples_per_pixel; ++s)
+            {
+                auto v = (static_cast<float>(i) + random_float()) / (image_width - 1);
+                auto u = (static_cast<float>(j) + random_float()) / (image_height - 1);
+                ray r = cam.get_ray(u, v);
+                pixel_color += ray_color(r, world);
+            }
+            write_color(std::cout, pixel_color, samples_per_pixel);
         }
     }
 
