@@ -20,9 +20,9 @@ color ray_color(const ray& r, const hittable& world, int depth)
     }
 
     // if t_min is absolute 0, it creates acne
-	if (world.hit(r, 0.001, infinity, rec)) {
+	if (world.hit(r, 0.001f, infinity, rec)) {
 		//return 0.5f * (rec.normal + color(1.0f, 1.0f, 1.0f)); // Old normal coloration
-        point3 target = rec.p + rec.normal + random_in_unit_sphere();
+        point3 target = rec.p + rec.normal + random_unit_vector();
         return 0.5f * ray_color(ray(rec.p, target - rec.p), world, depth - 1);
 	}
     // if hit nothing, render gradient bg
@@ -37,7 +37,7 @@ int main() {
     const auto aspect_ratio = 16.0f / 9.0f;
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int samples_per_pixel = 100;
+    const int samples_per_pixel = 200;
     const int max_depth = 50;
 
     // World
