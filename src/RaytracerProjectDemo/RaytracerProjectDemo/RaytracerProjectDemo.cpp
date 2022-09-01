@@ -57,7 +57,7 @@ int main() {
             {
                 auto v = (static_cast<float>(i) + random_float()) / (image_width - 1);
                 auto u = (static_cast<float>(j) + random_float()) / (image_height - 1);
-                ray r = cam.get_ray(u, v);
+                ray r = cam.get_ray(v, u);
                 pixel_color += ray_color(r, world);
             }
             write_color(std::cout, pixel_color, samples_per_pixel);
