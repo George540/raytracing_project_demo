@@ -6,6 +6,7 @@
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
+#include "material.h"
 
 #include <iostream>
 
@@ -21,9 +22,12 @@ color ray_color(const ray& r, const hittable& world, int depth)
 
     // if t_min is absolute 0, it creates acne
 	if (world.hit(r, 0.001f, infinity, rec)) {
-		//return 0.5f * (rec.normal + color(1.0f, 1.0f, 1.0f)); // Old normal coloration
-        point3 target = rec.p + rec.normal + random_unit_vector();
-        return 0.5f * ray_color(ray(rec.p, target - rec.p), world, depth - 1);
+        ray scattered;
+        color attenuation;
+        if (rec.mat_ptr-> scatter(r, rec, attenuation, scattered))
+        {
+	        return attenuation * ray_color(scattered, world, depth - 1);
+        }
 	}
     // if hit nothing, render gradient bg
 	vec3 unit_direction = unit_vector(r.direction());
@@ -42,8 +46,15 @@ int main() {
 
     // World
     hittable_list world;
-    world.add(make_shared<sphere>(point3(0.0f, 0.0f, -1.0f), 0.5f));
-    world.add(make_shared<sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f));
+    auto material_ground = make_shared<lambertian>(color(0.8f, 0.8f, 0.0f));
+    auto material_center = make_shared<lambertian>(color(0.7f, 0.3f, 0.3f));
+    auto material_left = make_shared<metal>(color(0.8f, 0.8f, 0.8f), 0.2f); // albedo, fuzziness
+    auto material_right = make_shared<metal>(color(0.8f, 0.6f, 0.2f), 0.9f);
+
+    world.add(make_shared<sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f, material_ground));
+    world.add(make_shared<sphere>(point3(0.0f, 0.0f, -1.0f), 0.5f, material_center));
+    world.add(make_shared<sphere>(point3(-1.0f, 0.0f, -1.0f), 0.5f, material_left));
+    world.add(make_shared<sphere>(point3(1.0f, 0.0f, -1.0f), 0.5f, material_right));
 
     // Camera
     camera cam;
