@@ -65,6 +65,13 @@ class vec3
 		{
 			return vec3(random_float(min, max), random_float(min, max), random_float(min, max));
 		}
+
+		bool near_zero() const
+		{
+			// Return true if the vector is close to zero in all dimensions.
+			const auto s = 1e-8;
+			return (fabs(coords[0]) < s) && (fabs(coords[1]) < s) && (fabs(coords[2]) < s);
+		}
 };
 
 // Type aliases for vec3
@@ -154,6 +161,11 @@ inline vec3 random_in_hemisphere(const vec3& normal) {
 
 inline vec3 random_unit_vector() {
 	return unit_vector(random_in_unit_sphere());
+}
+
+inline vec3 reflect(const vec3& v, const vec3& n)
+{
+	return v - 2.0f * dot(v, n) * n;
 }
 
 #endif
