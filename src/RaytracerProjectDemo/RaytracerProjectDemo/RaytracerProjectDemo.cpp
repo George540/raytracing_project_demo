@@ -46,6 +46,7 @@ int main() {
 
     // World
     hittable_list world;
+
     auto material_ground = make_shared<lambertian>(color(0.8f, 0.8f, 0.0f));
     auto material_center = make_shared<lambertian>(color(0.1f, 0.2f, 0.5f));
     auto material_left = make_shared<dielectric>(1.5f);
@@ -54,11 +55,11 @@ int main() {
     world.add(make_shared<sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f, material_ground));
     world.add(make_shared<sphere>(point3(0.0f, 0.0f, -1.0f), 0.5f, material_center));
     world.add(make_shared<sphere>(point3(-1.0f, 0.0f, -1.0f), 0.5f, material_left));
-    world.add(make_shared<sphere>(point3(-1.0f, 0.0f, -1.0f), -0.4f, material_left));
+    world.add(make_shared<sphere>(point3(-1.0f, 0.0f, -1.0f), -0.45f, material_left));
     world.add(make_shared<sphere>(point3(1.0f, 0.0f, -1.0f), 0.5f, material_right));
 
     // Camera
-    camera cam;
+    camera cam(point3(-2.0f, 2.0f, 1.0f), point3(0.0f, 0.0f, -1.0f), vec3(0.0f, 1.0f, 0.0f), 90.0f, aspect_ratio);
 
     // Render
 
