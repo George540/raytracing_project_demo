@@ -22,7 +22,13 @@ Contents Synopsis:
 - Camera Orientation and View properties
 - Defocus Blurring
 
-ReferenceS in IEEE:
+Reference of tutorial:
 
-“Ray Tracing in One Weekend.” raytracing.github.io/books/RayTracingInOneWeekend.html
-(accessed 08. 29, 2022)
+Title (series): “Ray Tracing in One Weekend Series”
+Title (book): “Ray Tracing in One Weekend”
+Author: Peter Shirley
+Editors: Steve Hollasch, Trevor David Black
+Version/Edition: v3.2.3
+Date: 2020-12-07
+URL (series): https://raytracing.github.io/
+URL (book): https://raytracing.github.io/books/RayTracingInOneWeekend.html
