@@ -163,6 +163,16 @@ inline vec3 random_unit_vector() {
 	return unit_vector(random_in_unit_sphere());
 }
 
+inline vec3 random_in_unit_disk() // generate random point inside unit disks
+{
+	while (true)
+	{
+		auto p = vec3(random_float(-1.0f, 1.0f), random_float(-1.0f, 1.0f), 0.0f);
+		if (p.length_squared() >= 1.0f) continue;
+		return p;
+	}
+}
+
 inline vec3 reflect(const vec3& v, const vec3& n)
 {
 	return v - 2.0f * dot(v, n) * n;
