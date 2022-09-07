@@ -35,35 +35,72 @@ color ray_color(const ray& r, const hittable& world, int depth)
 	return (1.0f - t) * color(1.0f, 1.0f, 1.0f) + t * color(0.5f, 0.7f, 1.0f);
 }
 
+hittable_list random_scene() {
+    hittable_list world;
+
+    auto ground_material = make_shared<lambertian>(color(0.5f, 0.5f, 0.5f));
+    world.add(make_shared<sphere>(point3(0.0f, -1000.0f, 0.0f), 1000.0f, ground_material));
+
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+	        const auto choose_mat = random_float();
+            point3 center(static_cast<float>(a) + 0.9f * random_float(), 0.2f, static_cast<float>(b) + 0.9f * random_float());
+
+            if ((center - point3(4.0f, 0.2f, 0.0f)).length() > 0.9f) {
+                shared_ptr<material> sphere_material;
+
+                if (choose_mat < 0.8f) {
+                    // diffuse
+                    auto albedo = color::random() * color::random();
+                    sphere_material = make_shared<lambertian>(albedo);
+                    world.add(make_shared<sphere>(center, 0.2f, sphere_material));
+                }
+                else if (choose_mat < 0.95f) {
+                    // metal
+                    auto albedo = color::random(0.5f, 1.0f);
+                    auto fuzz = random_float(0.0f, 0.5f);
+                    sphere_material = make_shared<metal>(albedo, fuzz);
+                    world.add(make_shared<sphere>(center, 0.2f, sphere_material));
+                }
+                else {
+                    // glass
+                    sphere_material = make_shared<dielectric>(1.5f);
+                    world.add(make_shared<sphere>(center, 0.2f, sphere_material));
+                }
+            }
+        }
+    }
+
+    auto material1 = make_shared<dielectric>(1.5f);
+    world.add(make_shared<sphere>(point3(0.0f, 1.0f, 0.0f), 1.0f, material1));
+
+    auto material2 = make_shared<lambertian>(color(0.4f, 0.2f, 0.1f));
+    world.add(make_shared<sphere>(point3(-4.0f, 1.0f, 0.0f), 1.0f, material2));
+
+    auto material3 = make_shared<metal>(color(0.7f, 0.6f, 0.5f), 0.0f);
+    world.add(make_shared<sphere>(point3(4.0f, 1.0f, 0.0f), 1.0f, material3));
+
+    return world;
+}
+
 int main() {
 
     // Image
     const auto aspect_ratio = 16.0f / 9.0f;
-    const int image_width = 400;
+    const int image_width = 500;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
     const int samples_per_pixel = 200;
     const int max_depth = 50;
 
     // World
-    hittable_list world;
-
-    auto material_ground = make_shared<lambertian>(color(0.8f, 0.8f, 0.0f));
-    auto material_center = make_shared<lambertian>(color(0.1f, 0.2f, 0.5f));
-    auto material_left = make_shared<dielectric>(1.5f);
-    auto material_right = make_shared<metal>(color(0.8f, 0.6f, 0.2f), 0.0f);
-
-    world.add(make_shared<sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f, material_ground));
-    world.add(make_shared<sphere>(point3(0.0f, 0.0f, -1.0f), 0.5f, material_center));
-    world.add(make_shared<sphere>(point3(-1.0f, 0.0f, -1.0f), 0.5f, material_left));
-    world.add(make_shared<sphere>(point3(-1.0f, 0.0f, -1.0f), -0.45f, material_left));
-    world.add(make_shared<sphere>(point3(1.0f, 0.0f, -1.0f), 0.5f, material_right));
+    auto world = random_scene();
 
     // Camera
-    point3 lookfrom(3.0f, 3.0f, 2.0f);
-    point3 lookat(0.0f, 0.0f, -1.0f);
+    point3 lookfrom(13.0f, 2.0f, 3.0f);
+    point3 lookat(0.0f, 0.0f, 0.0f);
     vec3 vup(0.0f, 1.0f, 0.0f);
-    auto dist_to_focus = (lookfrom - lookat).length();
-    auto aperture = 2.0f;
+    auto dist_to_focus = 10.0f;
+    auto aperture = 0.1f;
 
     camera cam(lookfrom, lookat, vup, 20.0f, aspect_ratio, aperture, dist_to_focus);
 
